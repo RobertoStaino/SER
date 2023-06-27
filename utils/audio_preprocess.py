@@ -1,6 +1,7 @@
 import librosa
 import numpy as np
 
+
 # each audio file is divided into samples, expressed by frequency. There are sr samples in a seconds.
 # in the spectrogram, the fast fourier transormations shrink the number of samples.
 # in this case the n_ftt is 512 so a second is given by 512/4 units.
