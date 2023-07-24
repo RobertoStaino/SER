@@ -163,3 +163,5 @@ Data/*
 .DS_Store
 CREMA-D/*
 data_path.csv
+prova.ipynb
+features*.csv

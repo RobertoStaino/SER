@@ -1,7 +1,6 @@
 import librosa
 import numpy as np
 
-
 # each audio file is divided into samples, expressed by frequency. There are sr samples in a seconds.
 # in the spectrogram, the fast fourier transormations shrink the number of samples.
 # in this case the n_ftt is 512 so a second is given by 512/4 units.
@@ -65,17 +64,19 @@ def audio_section(Xdb, sr = 22050, window = 0.5, threshold = -40): # works only 
 
     return unify_intervals(speech_sections) 
 
-def noise(data):
-    noise_amp = 0.035*np.random.uniform()*np.amax(data)
-    data = data + noise_amp*np.random.normal(size=data.shape[0])
-    return data
+### Data augmentation function
 
-def stretch(data, rate=0.8):
-    return librosa.effects.time_stretch(data, rate)
+def random_augmentation(data, sr = 22050, noise = 0.005):
 
-def shift(data):
     shift_range = int(np.random.uniform(low=-5, high = 5)*1000)
-    return np.roll(data, shift_range)
+    rate=np.random.uniform(0.6, 1.4)
+    pitch_factor=np.random.uniform(0.5, 1.5)
+    noise_amp = noise*np.random.uniform()*np.amax(data)
 
-def pitch(data, sampling_rate, pitch_factor=0.7):
-    return librosa.effects.pitch_shift(data, sampling_rate, pitch_factor)
+    # add random if ?
+    data = np.roll(data, shift_range) # shifting
+    data = librosa.effects.time_stretch(data, rate=rate) # stretching
+    data = librosa.effects.pitch_shift(data, sr=sr, n_steps=pitch_factor) # pitching
+    data = data + noise_amp*np.random.normal(size=data.shape[0]) # noise injection
+
+    return data
