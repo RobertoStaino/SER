@@ -41,17 +41,17 @@ def extract_features(data, sample_rate = 22050, n_mfcc = 13, spect = False):
 
     else:
         # MelSpectogram
-        mel = librosa.feature.melspectrogram(y=data, sr=sample_rate)
-        #result = np.hstack((result, np.mean(mel,  axis=1))) # MEAN - stacking horizontally
-        result = np.hstack((result, np.array(mel, axis=1))) # STD - stacking horizontally
+        result = librosa.feature.melspectrogram(y=data, sr=sample_rate)
 
     return result
 
-def get_features(path, synth = True, n_iter = 1, spect = False):
+def get_features(path, synth = True, n_iter = 1, spect = False, debug = False):
     data, sample_rate = librosa.load(path) # , duration=2.5, offset=0.6
     
     # without augmentation
-    res1 = extract_features(data, spect = False)
+    res1 = extract_features(data, spect = spect)
+    if (debug == True):
+        print("pre new axis:", res1.shape)
 
     if (synth):
         result = np.array(res1)
@@ -64,5 +64,7 @@ def get_features(path, synth = True, n_iter = 1, spect = False):
             counter += 1
     else:
         result = np.array(res1)[np.newaxis]
+        if (debug == True):
+            print("post new axis:", result.shape)
     
     return result
