@@ -86,7 +86,6 @@ tensorboard==2.13.0
 tensorboard-data-server==0.7.1
 tensorflow==2.13.0
 tensorflow-estimator==2.13.0
-tensorflow-macos==2.13.0
 termcolor==2.3.0
 threadpoolctl==3.1.0
 torch==2.0.1
@@ -98,3 +97,5 @@ urllib3==1.26.16
 wcwidth==0.2.6
 Werkzeug==2.3.6
 wrapt==1.15.0
+einops
+tqdm
