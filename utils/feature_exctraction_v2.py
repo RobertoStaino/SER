@@ -61,7 +61,7 @@ def extract_features(data, sample_rate=22050, n_mfcc=13, spect=False):
     return result
 
 
-def get_features(path, synth=True, n_iter=1, spect=False, debug=False):
+def get_features(path, n_aug=0, spect=False, debug=False):
     data, sample_rate = librosa.load(path)  # , duration=2.5, offset=0.6
 
     # without augmentation
@@ -69,9 +69,9 @@ def get_features(path, synth=True, n_iter=1, spect=False, debug=False):
     result = np.array(res1)[np.newaxis]
 
     synth_results = list()
-    if synth:
+    if n_aug:
         synth_results.append(result[0])
-        for _ in range(n_iter):
+        for _ in range(n_aug):
             # data with random augmentation
             noise_data = random_augmentation(data, sample_rate)
             res2 = extract_features(noise_data, spect=spect)
