@@ -167,3 +167,6 @@ data_path.csv
 prova.ipynb
 features*.csv
 backup/*
+RAVDESS/*
+TESS/*
+Savee/*

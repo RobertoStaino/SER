@@ -5,7 +5,7 @@ from utils.audio_preprocess import random_augmentation
 from sklearn.preprocessing import OneHotEncoder, StandardScaler 
 
 
-def extract_features(data, sample_rate = 22050, n_mfcc = 13, feats = False):
+def extract_features(data, sample_rate = 22050, n_mfcc = 13, feats = True):
     if feats:
         # ZCR
         result = np.array([])
@@ -48,7 +48,7 @@ def extract_features(data, sample_rate = 22050, n_mfcc = 13, feats = False):
 
     return result
 
-def get_features(path, n_aug = 0, feats = False, debug = False):
+def get_features(path, n_aug = 0, feats = True, debug = False):
     data, sample_rate = librosa.load(path) # , duration=2.5, offset=0.6
     
     # without augmentation
@@ -72,7 +72,7 @@ def get_features(path, n_aug = 0, feats = False, debug = False):
     
     return result
 
-def get2d_data (train, test, feats = False):
+def get2d_data (train, test, feats = True):
     x_train, y_train = [], []
     x_test, y_test = [], []
 

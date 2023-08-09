@@ -1,5 +1,7 @@
 import librosa
 import numpy as np
+import os
+import pandas as pd
 
 # each audio file is divided into samples, expressed by frequency. There are sr samples in a seconds.
 # in the spectrogram, the fast fourier transormations shrink the number of samples.
@@ -80,3 +82,112 @@ def random_augmentation(data, sr = 22050, noise = 0.005):
     data = data + noise_amp*np.random.normal(size=data.shape[0]) # noise injection
 
     return data
+
+def data_path(save_csv = False):
+    Crema = "CREMA-D/AudioWAV/"
+    Ravdess = "RAVDESS/audio_speech_actors_01-24/"
+    Tess = "TESS/"
+    Savee = "Savee/"
+    crema_directory_list = os.listdir(Crema)
+    ravdess_directory_list = os.listdir(Ravdess)
+    tess_directory_list = os.listdir(Tess)
+    savee_directory_list = os.listdir(Savee)
+    
+    # RADVESS
+    file_emotion = []
+    file_path = []
+    for dir in ravdess_directory_list:
+        if not dir.startswith('.'):
+            actor = os.listdir(Ravdess + dir)
+            for file in actor:
+                if not file.startswith('.'):
+                    part = file.split('.')[0]
+                    part = part.split('-')
+                    file_emotion.append(int(part[2]))
+                    file_path.append(Ravdess + dir + '/' + file)
+
+    emotion_df = pd.DataFrame(file_emotion, columns=['Emotions'])
+    path_df = pd.DataFrame(file_path, columns=['Path'])
+    Ravdess_df = pd.concat([emotion_df, path_df], axis=1)
+    Ravdess_df.Emotions.replace({1:'neutral', 2:'calm', 3:'happy', 4:'sad', 5:'angry', 6:'fear', 7:'disgust', 8:'surprise'}, inplace=True)
+
+    #Crema
+    file_emotion = []
+    file_path = []
+    for file in crema_directory_list:
+        if not file.startswith('.'):
+            file_path.append(Crema + file)
+            part=file.split('_')
+            if part[2] == 'SAD':
+                file_emotion.append('sad')
+            elif part[2] == 'ANG':
+                file_emotion.append('angry')
+            elif part[2] == 'DIS':
+                file_emotion.append('disgust')
+            elif part[2] == 'FEA':
+                file_emotion.append('fear')
+            elif part[2] == 'HAP':
+                file_emotion.append('happy')
+            elif part[2] == 'NEU':
+                file_emotion.append('neutral')
+            else:
+                file_emotion.append('Unknown')
+            
+    emotion_df = pd.DataFrame(file_emotion, columns=['Emotions'])
+    path_df = pd.DataFrame(file_path, columns=['Path'])
+    Crema_df = pd.concat([emotion_df, path_df], axis=1)
+    Crema_df['Emotions'] = pd.Categorical(Crema_df['Emotions'])
+    
+    # TESS
+    file_emotion = []
+    file_path = []
+    for dir in tess_directory_list:
+        if not dir.startswith('.'):
+            directories = os.listdir(Tess + dir)
+            for file in directories:
+                if not file.startswith('.'):
+                    part = file.split('.')[0]
+                    part = part.split('_')[2]
+                    if part=='ps':
+                        file_emotion.append('surprise')
+                    else:
+                        file_emotion.append(part)
+                    file_path.append(Tess + dir + '/' + file)
+    emotion_df = pd.DataFrame(file_emotion, columns=['Emotions'])
+    path_df = pd.DataFrame(file_path, columns=['Path'])
+    Tess_df = pd.concat([emotion_df, path_df], axis=1)
+    
+    # Savee
+    file_emotion = []
+    file_path = []
+    for file in savee_directory_list:
+        if not file.startswith('.'):
+            file_path.append(Savee + file)
+            part = file.split('_')[1]
+            ele = part[:-6]
+            if ele=='a':
+                file_emotion.append('angry')
+            elif ele=='d':
+                file_emotion.append('disgust')
+            elif ele=='f':
+                file_emotion.append('fear')
+            elif ele=='h':
+                file_emotion.append('happy')
+            elif ele=='n':
+                file_emotion.append('neutral')
+            elif ele=='sa':
+                file_emotion.append('sad')
+            else:
+                file_emotion.append('surprise')
+    emotion_df = pd.DataFrame(file_emotion, columns=['Emotions'])
+    path_df = pd.DataFrame(file_path, columns=['Path'])
+    Savee_df = pd.concat([emotion_df, path_df], axis=1)
+    
+    data_path = pd.concat([Ravdess_df, Crema_df, Tess_df, Savee_df], axis = 0)
+    if (save_csv): data_path.to_csv("Data/data_path.csv",index=False)
+    
+    # remove unbalanced
+    data_path = data_path[data_path.Emotions != "calm"]
+    data_path = data_path[data_path.Emotions != "surprise"]
+    
+    return data_path
