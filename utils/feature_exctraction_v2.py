@@ -63,7 +63,7 @@ def get3d_data (train, test, feats = False): # adjust n_aug for the number of sy
 
     # TRAIN + Augmentation
     for path, emotion in zip(train.Path, train.Emotions):
-        n_aug = np.random.randint(1, 4) if (str(np.random.randint(1, 10)) in path) else 0 #and np.random.choice([True, False])
+        n_aug = np.random.randint(0, 4) #if (str(np.random.randint(1, 10)) in path) else 0 and np.random.choice([True, False])
         feature = get_3dfeatures(path, n_aug=n_aug, feats=feats)
         for ele in feature:
             x_train.append(ele)
