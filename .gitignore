@@ -162,11 +162,7 @@ cython_debug/
 
 Data/*
 .DS_Store
-CREMA-D/*
 data_path.csv
 prova.ipynb
 features*.csv
 backup/*
-RAVDESS/*
-TESS/*
-Savee/*

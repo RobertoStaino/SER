@@ -84,10 +84,10 @@ def random_augmentation(data, sr = 22050, noise = 0.005):
     return data
 
 def data_path(save_csv = False):
-    Crema = "CREMA-D/AudioWAV/"
-    Ravdess = "RAVDESS/audio_speech_actors_01-24/"
-    Tess = "TESS/"
-    Savee = "Savee/"
+    Crema = "Data/CREMA-D/AudioWAV/"
+    Ravdess = "Data/RAVDESS/audio_speech_actors_01-24/"
+    Tess = "Data/TESS/"
+    Savee = "Data/Savee/"
     crema_directory_list = os.listdir(Crema)
     ravdess_directory_list = os.listdir(Ravdess)
     tess_directory_list = os.listdir(Tess)
