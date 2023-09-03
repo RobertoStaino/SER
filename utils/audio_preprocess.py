@@ -183,7 +183,7 @@ def data_path(save_csv = False):
     path_df = pd.DataFrame(file_path, columns=['Path'])
     Savee_df = pd.concat([emotion_df, path_df], axis=1)
     
-    data_path = pd.concat([Ravdess_df, Crema_df, Tess_df, Savee_df], axis = 0)
+    data_path = pd.concat([Ravdess_df, Crema_df, Tess_df, Savee_df], axis = 0, ignore_index=True)
     if (save_csv): data_path.to_csv("Data/data_path.csv",index=False)
     
     # remove unbalanced
@@ -191,31 +191,3 @@ def data_path(save_csv = False):
     data_path = data_path[data_path.Emotions != "surprise"]
     
     return data_path
-
-
-
-# WIP
-def pre_exctraction():
-    x_train, y_train = [], []
-    x_test, y_test = [], []
-
-    # TRAIN + Augmentation
-    for path, emotion in zip(train.Path, train.Emotions):
-        n_aug = np.random.randint(1, 4) if (str(np.random.randint(1, 10)) in path) else 0 #and np.random.choice([True, False])
-        feature = get_3dfeatures(path, n_aug=n_aug, feats=feats)
-        for ele in feature:
-            x_train.append(ele)
-            y_train.append(emotion)
-    print("Train exctraction complete. x_train ->", len(x_train))
-    
-    # TEST
-    for path, emotion in zip(test.Path, test.Emotions):
-        feature = get_3dfeatures(path, feats=feats)
-        for ele in feature:
-            x_test.append(ele)
-            y_test.append(emotion)
-    print("Test exctraction complete. x_test ->", len(x_test))
-
-    print("Final processing for NN.")
-    
-    return x_train, x_test, y_train, y_test

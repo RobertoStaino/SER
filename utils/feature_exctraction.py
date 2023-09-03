@@ -44,7 +44,7 @@ def extract_features(data, sample_rate = 22050, n_mfcc = 13, feats = True):
 
     else:
         # MelSpectogram
-        result = librosa.feature.melspectrogram(y=data, sr=sample_rate)
+        result = np.mean(librosa.feature.melspectrogram(y=data, sr=sample_rate).T, axis=0)
 
     return result
 
