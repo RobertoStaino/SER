@@ -3,6 +3,10 @@ import numpy as np
 import pandas as pd
 from utils.audio_preprocess import random_augmentation
 from sklearn.preprocessing import OneHotEncoder, StandardScaler 
+import uuid
+import os
+import tensorflow as tf
+from sklearn.model_selection import train_test_split
 
 
 def extract_features(data, sample_rate = 22050, n_mfcc = 13, feats = True):
@@ -37,7 +41,7 @@ def extract_features(data, sample_rate = 22050, n_mfcc = 13, feats = True):
         result = np.hstack((result, np.mean(rms,  axis=1))) # MEAN - stacking horizontally
         result = np.hstack((result, np.std(rms, axis=1))) # STD - stacking horizontally
 
-        # MelSpectogram
+        # MelSpectogram std
         mel = librosa.feature.melspectrogram(y=data, sr=sample_rate)
         #result = np.hstack((result, np.mean(mel,  axis=1))) # MEAN - stacking horizontally
         result = np.hstack((result, np.std(mel, axis=1))) # STD - stacking horizontally
@@ -72,26 +76,44 @@ def get_features(path, n_aug = 0, feats = True, debug = False):
     
     return result
 
-def get2d_data (train, test, feats = True):
-    x_train, y_train = [], []
-    x_test, y_test = [], []
+def get2d_data (data_path, max_aug = 1, feats = True, save_png = False):
+    max_aug = max_aug + 1 # +1 because random goes from 0 to n - 1 
+    if (save_png):
+        #x_train, y_train = [], []
+        #if not feats and not os.path.isdir('Data/spectr') and save_png:
+        #    os.mkdir('Data/spectr')
+        #    print('Directory "Data/spectr/" to store spectrograms created.')
+        #for path, emotion in zip(data_path.Path, data_path.Emotions):
+        #    n_aug = np.random.randint(0, max_aug) 
+        #    feature = get_3dfeatures(path, n_aug=n_aug, feats=feats)
+        #    for ele in feature:
+        #        spect_png(ele, emotion)
+        #print("Exctraction complete. x ->", len(x_train))
+        return [], [], [], []
+    else:
+        train, test = train_test_split(data_path, random_state=42, shuffle=True)
+        x_train, y_train = [], []
+        x_test, y_test = [], []
+        print("Exctracting and processing data...")
+        
+        # TRAIN + Augmentation
+        for path, emotion in zip(train.Path, train.Emotions):
+            n_aug = np.random.randint(0, max_aug) 
+            feature = get_features(path, n_aug=n_aug, feats=feats)
+            for ele in feature:
+                x_train.append(ele)
+                y_train.append(emotion)
+        print("Train exctraction complete. x_train ->", len(x_train))
 
-    # TRAIN + Augmentation
-    for path, emotion in zip(train.Path, train.Emotions):
-        n_aug = np.random.randint(1, 4) if (str(np.random.randint(1, 10)) in path) else 0 #and np.random.choice([True, False])
-        feature = get_features(path, n_aug=n_aug, feats=feats)
-        for ele in feature:
-            x_train.append(ele)
-            y_train.append(emotion)
-    print("Train exctraction complete. x_train.shape ->", len(x_train))
-    
-    # TEST
-    for path, emotion in zip(test.Path, test.Emotions):
-        feature = get_features(path, feats=feats)
-        for ele in feature:
-            x_test.append(ele)
-            y_test.append(emotion)
-    print("Test exctraction complete. x_test.shape ->", len(x_test))
+        # TEST
+        for path, emotion in zip(test.Path, test.Emotions):
+            feature = get_features(path, feats=feats)
+            for ele in feature:
+                x_test.append(ele)
+                y_test.append(emotion)
+        print("Test exctraction complete. x_test ->", len(x_test))
+
+        print("Final processing for NN.")
     
     # I want them as arrays
     Matrix_train = pd.DataFrame(x_train)
@@ -117,4 +139,4 @@ def get2d_data (train, test, feats = True):
     #for i in range(x_test.shape[0]):
     #    x_test[i] = scaler.fit_transform(x_test[i])
             
-    return x_train, y_train, x_test, y_test
+    return x_train, y_train, x_test, y_test, encoder

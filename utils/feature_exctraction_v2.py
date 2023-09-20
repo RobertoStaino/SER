@@ -90,7 +90,7 @@ def get3d_data(data_path, feats = False, max_aug = 0, save_png = False): # adjus
             for ele in feature:
                 spect_png(ele, emotion)
         print("Exctraction complete. x ->", len(x_train))
-        return [], [], [], []
+        return [], [], [], [], []
     else:
         train, test = train_test_split(data_path, random_state=42, shuffle=True)
         x_train, y_train = [], []
@@ -143,7 +143,7 @@ def get3d_data(data_path, feats = False, max_aug = 0, save_png = False): # adjus
         print("y_test.shape -> ", y_test.shape)
         print("Done.")
 
-        return x_train, y_train, x_test, y_test
+        return x_train, y_train, x_test, y_test, encoder
 
 def spect_png(ele, emotion):
     if not os.path.isdir(f'Data/spectr/{emotion}'):
@@ -170,3 +170,33 @@ def prepare_png(ds, augment=False):
     ds = ds.map(lambda x, y: (rescale(x, training=True), y))
     if augment: ds = ds.map(lambda x, y: (flip_and_rotate(x, training=True), y))
     return ds
+
+def png_processing(OUTPUT_DIR = 'Data/spectr/', BATCH_SIZE = 32, IMAGE_HEIGHT = 256, IMAGE_WIDTH = 256):
+
+    # Make a dataset containing the training spectrograms
+    xpng_train = tf.keras.preprocessing.image_dataset_from_directory(
+                                                 batch_size=BATCH_SIZE,
+                                                 validation_split=0.2,
+                                                 directory=OUTPUT_DIR,
+                                                 shuffle=True,
+                                                 label_mode='categorical',
+                                                 color_mode='rgb',
+                                                 image_size=(IMAGE_HEIGHT, IMAGE_WIDTH),
+                                                 subset="training",
+                                                 seed=42)
+
+    # Make a dataset containing the validation spectrogram
+    xpng_test = tf.keras.preprocessing.image_dataset_from_directory(
+                                                 batch_size=BATCH_SIZE,
+                                                 validation_split=0.2,
+                                                 directory=OUTPUT_DIR,
+                                                 shuffle=True,
+                                                 label_mode='categorical',
+                                                 color_mode='rgb',
+                                                 image_size=(IMAGE_HEIGHT, IMAGE_WIDTH),
+                                                 subset="validation",
+                                                 seed=42)
+
+    xpng_train = prepare_png(xpng_train, augment=False)
+    xpng_test = prepare_png(xpng_test, augment=False)
+    return xpng_train, xpng_test
