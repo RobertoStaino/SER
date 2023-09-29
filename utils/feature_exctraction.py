@@ -43,7 +43,7 @@ def extract_features(data, sample_rate = 22050, n_mfcc = 13, feats = True):
 
         # MelSpectogram std
         mel = librosa.feature.melspectrogram(y=data, sr=sample_rate)
-        #result = np.hstack((result, np.mean(mel,  axis=1))) # MEAN - stacking horizontally
+        result = np.hstack((result, np.mean(mel,  axis=1))) # MEAN - stacking horizontally
         result = np.hstack((result, np.std(mel, axis=1))) # STD - stacking horizontally
 
     else:
